@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>demo-01</title>
+  <link rel="stylesheet" href="../script/lib/layer/skin/layer.css">
+  <link href="../script/lib/ol-v5.0.2-dist/ol.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+  <div class="app">
+    <div id="map"></div>
+    <!-- ==================================================== -->
+    <!-- ********************* -->
+    <div class="draw_btn draw_start" id="draw_start">开始绘制</div>
+    <div class="draw">
+      <select name="" id="draw_type">
+        <option value="Point">Point</option>
+        <option value="LineString">line</option>
+        <option value="Circle">Circle</option>
+        <option value="Polygon">Polygon</option>
+      </select>
+    </div>
+    <!-- ********************* -->
+    <div class="draw_btn draw_edit" id="draw_edit">开始编辑</div>
+    <div class="draw_btn draw_edit_done" id="draw_edit_done">编辑完成</div>
+
+    <!-- ******************** -->
+    <div class="draw_btn draw_del" id="draw_del">清除绘制</div>
+
+    <!-- ********************* -->
+    <div class="draw_btn draw_yes" id="draw_yes">提交数据</div>
+    <!-- ==================================================== -->
+
+
+    <!-- 历史轨迹的开始 -->
+    <div class="his_s" id="his_s">开始</div>
+    <!-- 这个不知道是哪里的 -->
+    <div class="tool" id="tool">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</body>
+<!-- JQ -->
+<script src="../script/lib/jquery/jquery.js" type="text/javascript"></script>
+<!-- layer -->
+<script src="../script/lib/layer/layer.js" type="text/javascript"></script>
+<!-- ol -->
+<script src="../script/lib/ol-v5.0.2-dist/ol.js" type="text/javascript"></script>
+<!-- test -->
+<script src="./test_data.js" type="text/javascript"></script>
+<!-- main -->
+<script src="./index.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+  new CC().init();
+});
+</script>
+
+</html>
