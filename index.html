@@ -11,38 +11,26 @@
 
 <body>
   <div class="app">
-    <div id="map"></div>
-    <!-- ==================================================== -->
-    <!-- ********************* -->
-    <div class="draw_btn draw_start" id="draw_start">开始绘制</div>
-    <div class="draw">
-      <select name="" id="draw_type">
-        <option value="Point">Point</option>
-        <option value="LineString">line</option>
-        <option value="Circle">Circle</option>
-        <option value="Polygon">Polygon</option>
-      </select>
+    <!-- nav -->
+    <div class="nav" id="nav">
+      <div class="item " key='1'>单点追踪</div>
+      <div class="item " key='2'>实时监控</div>
+      <div class="item " key='3'>历史轨迹</div>
+      <div class="item ac" key='4'>地图绘制</div>
     </div>
-    <!-- ********************* -->
-    <div class="draw_btn draw_edit" id="draw_edit">开始编辑</div>
-    <div class="draw_btn draw_edit_done" id="draw_edit_done">编辑完成</div>
-
-    <!-- ******************** -->
-    <div class="draw_btn draw_del" id="draw_del">清除绘制</div>
-
-    <!-- ********************* -->
-    <div class="draw_btn draw_yes" id="draw_yes">提交数据</div>
-    <!-- ==================================================== -->
-
-
-    <!-- 历史轨迹的开始 -->
-    <div class="his_s" id="his_s">开始</div>
-    <!-- 这个不知道是哪里的 -->
+    <!-- tool -->
     <div class="tool" id="tool">
-      <span></span>
-      <span></span>
-      <span></span>
+      
     </div>
+    <div id="map"></div>
+
+
+
+
+
+
+
+
   </div>
 </body>
 <!-- JQ -->
