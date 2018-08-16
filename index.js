@@ -19,7 +19,7 @@
           })
         }),
         // 刷新时间
-        time: 1000,
+        time: 200,
       },
 
       // 监控
@@ -33,7 +33,7 @@
         // 运动标识
         move_key: false,
         // 轨迹时间
-        time: 1000,
+        time: 100,
       },
 
 
@@ -242,7 +242,7 @@
 
       var fn = {
         _init: function() {
-
+          // 
           me._map();
 
           // 导航
@@ -299,8 +299,8 @@
           // 上次是监控模式
           else if (me.all_obj.key == 2) {
 
-            console.log('_clear_all_monitor');
-            me._all_monitor_clear();
+            console.log('_clear_all_m');
+            me._all_m_clear();
           }
           // 上次是轨迹模式
           else if (me.all_obj.key == 3) {
@@ -325,7 +325,7 @@
           }
           // 实时监控
           else if (key == 2) {
-            me._all_monitor();
+            me._all_m();
           }
           // 历史轨迹
           else if (key == 3) {
@@ -480,6 +480,351 @@
             return one_p;
           }
         },
+        // 点的转向角度设置  new_p 上一点的坐标 old_p 下一点的坐标
+        _map_p_rotation: function(new_p, old_p) {
+          // 90度的PI值
+          var pi_90 = Math.atan2(1, 0);
+          // 当前点的PI值
+          var pi_ac = Math.atan2(new_p[1] - old_p[1], new_p[0] - old_p[0]);
+
+          return pi_90 - pi_ac;
+        },
+
+
+
+
+        // ==========================================================
+        // 
+        _monitor: function() {
+          // 初始化参数
+          me._monitor_set();
+          // 层构建
+          me._monitor_layer();
+          // 打点
+          me._monitor_p();
+
+
+
+          // 开始移动
+          me._monitor_init();
+        },
+        // 初始化参数
+        _monitor_set: function() {
+          me.all_obj.monitor.key = true;
+        },
+        // 层数据
+        _monitor_layer: function() {
+
+          // 层
+          me.all_obj.monitor.layer = new ol.layer.Vector();
+
+          // 数据容器
+          me.all_obj.monitor.data_c = new ol.source.Vector();
+
+          // 注入层
+          me.all_obj.monitor.layer.setSource(me.all_obj.monitor.data_c);
+
+          // 打到地图上
+          me.map.addLayer(me.all_obj.monitor.layer);
+        },
+
+        // 点
+        _monitor_p: function() {
+          // console.log(mk_data_c);
+          // 创建一个活动图标需要的Feature，并设置位置
+          var p_data = new ol.Feature({
+            // 就一个参数啊，定义坐标
+            geometry: new ol.geom.Point(me.conf.monitor.p)
+          });
+
+
+          p_data.setStyle(new ol.style.Style({
+            // 设置一个标识
+            image: new ol.style.Icon({
+              src: './img/user.png',
+
+              // 这个是相当于是进行切图了
+              // size: [50,50],
+
+              // 注意这个，竟然是比例 左上[0,0]  左下[0,1]  右下[1，1]
+              anchor: [0.5, 0.5],
+              // 这个直接就可以控制大小了
+              scale: 0.5,
+
+              // 开启转向
+              rotateWithView: true,
+              // rotation: 0,
+            }),
+
+            text: new ol.style.Text({
+              // 对其方式
+              textAlign: 'center',
+              // 基准线
+              textBaseline: 'middle',
+              offsetY: -30,
+              // 文字样式
+              font: 'normal 16px 黑体',
+              // 文本内容
+              text: "name:admin",
+              // 文本填充样式
+              fill: new ol.style.Fill({
+                color: 'rgba(255,255,255,1)'
+              }),
+              padding: [5, 5, 5, 5],
+              backgroundFill: new ol.style.Fill({
+                color: 'rgba(0,0,255,0.6)'
+              }),
+            })
+          }));
+
+          // 数据层收集marker
+          me.all_obj.monitor.data_c.addFeature(p_data);
+
+          // 最优一次
+          // 最优一次
+          me._map_fit(me.all_obj.monitor.data_c);
+
+          // 拿到全局
+          me.all_obj.monitor.p_data = p_data;
+        },
+        // 开始追踪
+        _monitor_init: function() {
+          // 追踪
+          var old_p = null;
+          var new_p = [0, 0];
+
+
+          me.all_obj.monitor.timer = setTimeout(function() {
+            // 得到旧的点
+            old_p = me.all_obj.monitor.p_data.getGeometry().flatCoordinates;
+
+
+            // ***********************************模拟数据
+            if (Math.random() > 0.5) {
+              new_p[0] = old_p[0] + Math.random() * me.conf.monitor.set_num;
+            } else {
+              new_p[0] = old_p[0] - Math.random() * me.conf.monitor.set_num;
+            }
+
+
+            if (Math.random() > 0.5) {
+              new_p[1] = old_p[1] + Math.random() * me.conf.monitor.set_num;
+            } else {
+              new_p[1] = old_p[1] - Math.random() * me.conf.monitor.set_num;
+            }
+            // *******************************************
+
+
+
+            if (me.all_obj.monitor.key) {
+              // 移动点--改变这个数据就行了
+              me.all_obj.monitor.p_data.setGeometry(new ol.geom.Point(new_p));
+
+
+              me.all_obj.monitor.p_data.getStyle().getImage()
+                .setRotation(me._map_p_rotation(new_p, old_p));
+
+              // 线的数据
+              me._monitor_init_line(new_p, old_p);
+
+              // 
+              me._monitor_init();
+
+              console.log('monitor');
+            }
+          }, me.conf.monitor.time);
+        },
+        // 初始化线
+        _monitor_init_line: function(new_p, old_p) {
+
+          var line_data = new ol.Feature({
+            geometry: new ol.geom.LineString([old_p, new_p])
+          });
+          line_data.setStyle(me.conf.monitor.line_style);
+
+          // 注入容器
+          me.all_obj.monitor.data_c.addFeature(line_data);
+        },
+        // 清除
+        _monitor_clear: function() {
+          // 清除定时器
+          clearTimeout(me.all_obj.monitor.timer);
+          me.all_obj.monitor.key = false;
+
+          // 清除所有数据
+          me.all_obj.monitor.data_c.clear();
+          // 清除这层
+          me.map.removeLayer(me.all_obj.monitor.layer);
+        },
+
+
+
+        // ==========================================================
+        _history: function() {
+          me._history_set();
+          // 层
+          me._history_layer();
+
+
+          // 点
+          me._history_p();
+          // 线
+          me._history_lines();
+
+
+          // 最优一次
+          me._map_fit(me.all_obj.history.data_c);
+        },
+        // 一些设置
+        _history_set: function() {
+          $('#tool')
+            .show()
+            .html(`
+              <div class="item his_s" id="his_s">开始</div>
+            `)
+            .off()
+            .on('click', '#his_s', function() {
+              // 隐藏
+              $('#his_s').hide();
+              // 运动标识
+              me.conf.history.move_key = true;
+
+              me._history_start(1);
+            });
+
+          // $('#tool')
+        },
+        // layer
+        _history_layer: function() {
+
+          // 矢量容器层
+          me.all_obj.history.layer = new ol.layer.Vector();
+
+          // 注入数据层--可以注入多个Feature，每个feature有自己的数据和样式
+          me.all_obj.history.data_c = new ol.source.Vector();
+
+          // 
+          me.all_obj.history.layer.setSource(me.all_obj.history.data_c);
+
+          // 打到地图上
+          me.map.addLayer(me.all_obj.history.layer);
+        },
+        // 
+        _history_p: function() {
+
+          // console.log(mk_data_c);
+          // 创建一个活动图标需要的Feature，并设置位置
+          var p_data = new ol.Feature({
+            // 就一个参数啊，定义坐标
+            geometry: new ol.geom.Point(lines_arr[0])
+          });
+          p_data.setStyle(
+            new ol.style.Style({
+              // 设置一个标识
+              image: new ol.style.Icon({
+                src: './img/user.png',
+
+                // 这个是相当于是进行切图了
+                // size: [50,50],
+
+                // 注意这个，竟然是比例 左上[0,0]  左下[0,1]  右下[1，1]
+                anchor: [0.5, 0.5],
+                // 这个直接就可以控制大小了
+                scale: 0.5,
+                // 开启转向
+                rotateWithView: true,
+                rotation: me._map_p_rotation(lines_arr[1], lines_arr[0]),
+              }),
+
+              text: new ol.style.Text({
+                // 对其方式
+                textAlign: 'center',
+                // 基准线
+                textBaseline: 'middle',
+                offsetY: -25,
+                // 文字样式
+                font: 'normal 16px 黑体',
+                // 文本内容
+                text: "name:admin",
+                // 文本填充样式
+                fill: new ol.style.Fill({
+                  color: 'rgba(255,255,255,1)'
+                }),
+                padding: [5, 5, 5, 5],
+                backgroundFill: new ol.style.Fill({
+                  color: 'rgba(0,0,0,0.6)'
+                }),
+              })
+            })
+          );
+
+          // 数据层收集marker
+          me.all_obj.history.data_c.addFeature(p_data);
+
+          // 拿到全局
+          me.all_obj.history.p_data = p_data;
+        },
+        // 
+        _history_lines: function() {
+          var lines_data = new ol.Feature({
+            geometry: new ol.geom.LineString(lines_arr)
+          });
+
+          lines_data.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              width: 8,
+              color: [255, 0, 0, 1],
+              lineDash: [10, 10],
+            })
+          }));
+
+          // 注入数据层
+          me.all_obj.history.data_c.addFeature(lines_data);
+        },
+        // 开始运动
+        _history_start: function(index) {
+          // 开始运动
+
+          setTimeout(function() {
+            index++;
+            if (index == lines_arr.length) {
+              // 运动完毕
+              me.conf.history.move_key = false;
+              layer.msg('运动完毕');
+              $('#his_s').show();
+              return;
+            }
+            // 
+            else {
+
+              var old_p = me.all_obj.history.p_data.getGeometry().flatCoordinates;
+              var new_p = lines_arr[index];
+
+              me.all_obj.history.p_data.setGeometry(new ol.geom.Point(new_p));
+              me.all_obj.history.p_data
+                .getStyle()
+                .getImage()
+                .setRotation(me._map_p_rotation(new_p, old_p));
+
+              me._history_start(index);
+            }
+          }, me.conf.history.time);
+        },
+        // 清除
+        _history_clear: function() {
+
+          // 清除所有数据
+          me.all_obj.history.data_c.clear();
+          // 清除这层
+          me.map.removeLayer(me.all_obj.history.layer);
+
+          $('#tool')
+            .hide();
+        },
+
+
+
+
 
 
 
@@ -1071,158 +1416,7 @@
 
 
 
-        // ==========================================================
-        _history: function() {
-          me._history_set();
-          // 层
-          me._history_layer();
 
-
-          // 点
-          me._history_p();
-          // 线
-          me._history_lines();
-
-
-          // 最优一次
-          me._map_fit(me.all_obj.history.data_c);
-        },
-        // 一些设置
-        _history_set: function() {
-          $('#tool')
-            .show()
-            .html(`
-              <div class="item his_s" id="his_s">开始</div>
-            `)
-            .off()
-            .on('click', '#his_s', function() {
-              // 隐藏
-              $('#his_s').hide();
-              // 运动标识
-              me.conf.history.move_key = true;
-
-              me._history_start(1);
-            });
-
-          // $('#tool')
-        },
-        // layer
-        _history_layer: function() {
-
-          // 矢量容器层
-          me.all_obj.history.layer = new ol.layer.Vector();
-
-          // 注入数据层--可以注入多个Feature，每个feature有自己的数据和样式
-          me.all_obj.history.data_c = new ol.source.Vector();
-
-          // 
-          me.all_obj.history.layer.setSource(me.all_obj.history.data_c);
-
-          // 打到地图上
-          me.map.addLayer(me.all_obj.history.layer);
-        },
-        // 
-        _history_p: function() {
-
-          // console.log(mk_data_c);
-          // 创建一个活动图标需要的Feature，并设置位置
-          var p_data = new ol.Feature({
-            // 就一个参数啊，定义坐标
-            geometry: new ol.geom.Point(lines_arr[0])
-          });
-          p_data.setStyle(
-            new ol.style.Style({
-              // 设置一个标识
-              image: new ol.style.Icon({
-                src: './img/car.png',
-
-                // 这个是相当于是进行切图了
-                // size: [50,50],
-
-                // 注意这个，竟然是比例 左上[0,0]  左下[0,1]  右下[1，1]
-                anchor: [0.5, 0.5],
-                // 这个直接就可以控制大小了
-                scale: 0.5
-              }),
-
-              text: new ol.style.Text({
-                // 对其方式
-                textAlign: 'center',
-                // 基准线
-                textBaseline: 'middle',
-                offsetY: -25,
-                // 文字样式
-                font: 'normal 16px 黑体',
-                // 文本内容
-                text: "name:admin",
-                // 文本填充样式
-                fill: new ol.style.Fill({
-                  color: 'rgba(255,255,255,1)'
-                }),
-                padding: [5, 5, 5, 5],
-                backgroundFill: new ol.style.Fill({
-                  color: 'rgba(0,0,0,0.6)'
-                }),
-              })
-            })
-          );
-
-          // 数据层收集marker
-          me.all_obj.history.data_c.addFeature(p_data);
-
-          // 拿到全局
-          me.all_obj.history.p_data = p_data;
-        },
-        // 
-        _history_lines: function() {
-          var lines_data = new ol.Feature({
-            geometry: new ol.geom.LineString(lines_arr)
-          });
-
-          lines_data.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({
-              width: 8,
-              color: [255, 0, 0, 1],
-              lineDash: [10, 10],
-            })
-          }));
-
-          // 注入数据层
-          me.all_obj.history.data_c.addFeature(lines_data);
-        },
-        // 开始运动
-        _history_start: function(index) {
-          // 开始运动
-
-          setTimeout(function() {
-            index++;
-            if (index == lines_arr.length) {
-              // 运动完毕
-              me.conf.history.move_key = false;
-              layer.msg('运动完毕');
-              $('#his_s').show();
-              return;
-            }
-            // 
-            else {
-
-              console.log('moving---')
-              me.all_obj.history.p_data.setGeometry(new ol.geom.Point(lines_arr[index]));
-              me._history_start(index);
-            }
-          }, me.conf.history.time);
-        },
-        // 清除
-        _history_clear: function() {
-
-          // 清除所有数据
-          me.all_obj.history.data_c.clear();
-          // 清除这层
-          me.map.removeLayer(me.all_obj.history.layer);
-
-          $('#tool')
-            .hide();
-        },
 
 
 
@@ -1233,25 +1427,25 @@
 
         // ==========================================================
         // 实时监控所有
-        _all_monitor: function() {
+        _all_m: function() {
 
           // 参数设置
-          me._all_monitor_set();
+          me._all_m_set();
 
           // 设置层
-          me._all_monitor_layer();
+          me._all_m_layer();
 
           // 初始化
-          me._all_monitor_init(ps_arr);
+          me._all_m_init(ps_arr);
 
           // 最优一次
           me._map_fit(me.all_obj.all_monitor.data_c);
         },
         // 初始化参数
-        _all_monitor_set: function() {
+        _all_m_set: function() {
           me.all_obj.all_monitor.key = true;
         },
-        _all_monitor_layer: function() {
+        _all_m_layer: function() {
           // 层
           me.all_obj.all_monitor.layer = new ol.layer.Vector();
 
@@ -1265,7 +1459,7 @@
           me.map.addLayer(me.all_obj.all_monitor.layer);
         },
         // 所有点的初始化
-        _all_monitor_init: function() {
+        _all_m_init: function() {
 
 
           // ********************************************模拟数据
@@ -1283,7 +1477,7 @@
           //
           ps_arr.forEach(function(ele, index) {
             // 添加点
-            me._all_monitor_init_marker(ele);
+            me._all_m_init_marker(ele);
           });
 
 
@@ -1291,13 +1485,13 @@
             if (me.all_obj.all_monitor.key) {
               console.log('all_monitor');
               me.all_obj.all_monitor.data_c.clear();
-              me._all_monitor_init();
+              me._all_m_init();
             }
 
           }, me.conf.all_monitor.time);
         },
         // 添加点
-        _all_monitor_init_marker: function(ele) {
+        _all_m_init_marker: function(ele) {
           var p_data = new ol.Feature({
             // 就一个参数啊，定义坐标
             geometry: new ol.geom.Point(ele.lnglat),
@@ -1346,7 +1540,7 @@
           me.all_obj.all_monitor.data_c.addFeature(p_data);
         },
         // 数据容器
-        _all_monitor_clear: function() {
+        _all_m_clear: function() {
           // 清除定时器
           clearTimeout(me.all_obj.all_monitor.timer);
           me.all_obj.all_monitor.key = false;
@@ -1359,159 +1553,7 @@
 
 
 
-        // ==========================================================
-        // 
-        _monitor: function() {
-          // 初始化参数
-          me._monitor_set();
-          // 层构建
-          me._monitor_layer();
-          // 打点
-          me._monitor_p();
 
-
-
-          // 开始移动
-          me._monitor_init();
-        },
-        // 初始化参数
-        _monitor_set: function() {
-          me.all_obj.monitor.key = true;
-        },
-        // 层数据
-        _monitor_layer: function() {
-
-          // 层
-          me.all_obj.monitor.layer = new ol.layer.Vector();
-
-          // 数据容器
-          me.all_obj.monitor.data_c = new ol.source.Vector();
-
-          // 注入层
-          me.all_obj.monitor.layer.setSource(me.all_obj.monitor.data_c);
-
-          // 打到地图上
-          me.map.addLayer(me.all_obj.monitor.layer);
-        },
-        // 点
-        _monitor_p: function() {
-          // console.log(mk_data_c);
-          // 创建一个活动图标需要的Feature，并设置位置
-          var p_data = new ol.Feature({
-            // 就一个参数啊，定义坐标
-            geometry: new ol.geom.Point(me.conf.monitor.p)
-          });
-
-          p_data.setStyle(new ol.style.Style({
-            // 设置一个标识
-            image: new ol.style.Icon({
-              src: './img/user.png',
-
-              // 这个是相当于是进行切图了
-              // size: [50,50],
-
-              // 注意这个，竟然是比例 左上[0,0]  左下[0,1]  右下[1，1]
-              anchor: [0.5, 0.5],
-              // 这个直接就可以控制大小了
-              scale: 0.5
-            }),
-
-            text: new ol.style.Text({
-              // 对其方式
-              textAlign: 'center',
-              // 基准线
-              textBaseline: 'middle',
-              offsetY: -30,
-              // 文字样式
-              font: 'normal 16px 黑体',
-              // 文本内容
-              text: "name:admin",
-              // 文本填充样式
-              fill: new ol.style.Fill({
-                color: 'rgba(255,255,255,1)'
-              }),
-              padding: [5, 5, 5, 5],
-              backgroundFill: new ol.style.Fill({
-                color: 'rgba(0,0,255,0.6)'
-              }),
-            })
-          }));
-
-          // 数据层收集marker
-          me.all_obj.monitor.data_c.addFeature(p_data);
-
-          // 最优一次
-          // 最优一次
-          me._map_fit(me.all_obj.monitor.data_c);
-
-          // 拿到全局
-          me.all_obj.monitor.p_data = p_data;
-        },
-        // 开始追踪
-        _monitor_init: function() {
-          // 追踪
-          var old_p = null;
-          var new_p = [0, 0];
-
-
-          me.all_obj.monitor.timer = setTimeout(function() {
-            // 得到旧的点
-            old_p = me.all_obj.monitor.p_data.getGeometry().flatCoordinates;
-
-
-            // ***********************************模拟数据
-            if (Math.random() > 0.5) {
-              new_p[0] = old_p[0] + Math.random() * me.conf.monitor.set_num;
-            } else {
-              new_p[0] = old_p[0] - Math.random() * me.conf.monitor.set_num;
-            }
-
-
-            if (Math.random() > 0.5) {
-              new_p[1] = old_p[1] + Math.random() * me.conf.monitor.set_num;
-            } else {
-              new_p[1] = old_p[1] - Math.random() * me.conf.monitor.set_num;
-            }
-            // *******************************************
-
-
-
-            if (me.all_obj.monitor.key) {
-              // 移动点--改变这个数据就行了
-              me.all_obj.monitor.p_data.setGeometry(new ol.geom.Point(new_p));
-
-              // 线的数据
-              me._monitor_init_line(new_p, old_p);
-
-              // 
-              me._monitor_init();
-
-              console.log('monitor');
-            }
-          }, me.conf.monitor.time);
-        },
-        // 初始化线
-        _monitor_init_line: function(new_p, old_p) {
-
-          var line_data = new ol.Feature({
-            geometry: new ol.geom.LineString([old_p, new_p])
-          });
-          line_data.setStyle(me.conf.monitor.line_style);
-
-          // 注入容器
-          me.all_obj.monitor.data_c.addFeature(line_data);
-        },
-        // 清除
-        _monitor_clear: function() {
-          // 清除定时器
-          clearTimeout(me.all_obj.monitor.timer);
-          me.all_obj.monitor.key = false;
-
-          // 清除所有数据
-          me.all_obj.monitor.data_c.clear();
-          // 清除这层
-          me.map.removeLayer(me.all_obj.monitor.layer);
-        },
 
 
 
