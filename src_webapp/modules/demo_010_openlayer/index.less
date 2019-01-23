@@ -1,0 +1,307 @@
+* {
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Microsoft Yahei';
+  border: 0;
+  background-color: rgb(49, 56, 74);
+}
+
+
+/* ------------------------------ */
+
+// 
+.app {
+  width: 100%;
+  height: 100%;
+  background-color: rgb(49, 56, 74);
+  position: relative;
+  >.nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+    >.item {
+      float: left;
+      width: 150px;
+      height: 100%;
+      line-height: 50px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: yellow;
+      margin-right: 3px;
+      transition: all 0.1s ease-in;
+      font-size: 18px;
+    }
+    >.ac {
+      background-color: blue;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 400;
+      width: 300px;
+    }
+  }
+  >#map {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 999;
+  }
+  >.tool {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1001;
+    width: 120px;
+    height: 100%;
+    background-color: rgba( 0, 0, 0, 0);
+    box-sizing: border-box;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 5px;
+    display: none;
+    >.item {
+      width: 100%;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      font-size: 14px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 5px;
+      border-radius: 100px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+      transition: all 0.1s ease-in;
+    }
+
+    // ==============================围栏
+    // 占位符
+    >.mode_place{
+      background-color: rgba(0,0,0,0);
+      color: rgba(0,0,0,0);
+      box-shadow: none;
+    }
+    // 模式1
+    >.mode_1{
+      background-color: rgb( 0, 0, 128);
+      color: #fff;
+    }
+    // 模式二
+    >.mode_2{
+      background-color: rgb(165,42,42);
+      color: yellow;
+    }
+    >.mode_red{
+      background-color: rgb(255,0,0);
+      color: #fff;
+    }
+    >.mode_green{
+      background-color: rgb(127,255,0);
+      color: #000;
+    }
+    // ==============================历史轨迹
+    >.his_s{
+      background-color: rgb( 0, 0, 128);
+      color: #fff;
+    }
+  
+  }
+
+}
+
+
+/* -------------------------------- */
+
+
+/* -----------------------------------弹窗 */
+
+.cc_layer {
+  border-radius: 4px!important;
+  >.layui-layer-content {
+    border-radius: 4px!important;
+  }
+}
+
+
+/* 站点数据检索 */
+
+.layer_core {
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+  color: #ccc;
+  position: relative;
+  box-sizing: border-box;
+  padding-top: 40px;
+  >.title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background: #2B3648;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding-left: 20px;
+  }
+  >.box {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+    padding-bottom: 52px;
+    // 工具栏
+    >.tool {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 52px;
+      >.box {
+        width: 140px;
+        height: 32px;
+        position: absolute;
+        left: 50%;
+        top: 10px;
+        margin-left: -70px;
+        >span {
+          display: block;
+          float: left;
+          width: 65px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          background: #FFFFFF;
+          box-sizing: border-box;
+          border: 1px solid #D9D9D9;
+          border-radius: 4px;
+          cursor: pointer;
+          color: #000;
+        }
+        >.cancel {
+          margin-right: 10px;
+        }
+        >.save {
+          background: url('./img/jz_btn_search.png') center center no-repeat;
+          background-size: cover;
+          color: #fff;
+        }
+      }
+    }
+    // 主要盒子
+    >.main_box {
+      width: 100%;
+      height: 100%;
+      // =======================第一页的样式
+      >.normal {
+        height: 100px;
+        width: 100px;
+        float: left;
+        position: relative;
+        >.box {
+          width: 93%;
+          height: 93%;
+          line-height: 93px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+          transition: all 0.1s ease-in;
+          cursor: pointer;
+          >.title {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0%;
+            left: 0%;
+            z-index: 1;
+            background-color: rgba(0, 0, 255, 0.8);
+            text-align: center;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+          }
+          >img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 2;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+          }
+        }
+        >.box:hover,
+        >.ac {
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+          >.title {
+            z-index: 3;
+            display: block;
+          }
+        }
+      }
+    }
+    // ----------------------
+  }
+  >.del_box {
+    width: 100%;
+    height: 100%;
+    >.info {
+      width: 100%;
+      height: 50%;
+      line-height: 75px;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    >.tool {
+      width: 100%;
+      height: 50%;
+      position: relative;
+      >.box {
+        width: 140px;
+        height: 32px;
+        position: absolute;
+        left: 50%;
+        top: 10px;
+        margin-left: -70px;
+        >span {
+          display: block;
+          float: left;
+          width: 65px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          background: #FFFFFF;
+          box-sizing: border-box;
+          border: 1px solid #D9D9D9;
+          border-radius: 4px;
+          cursor: pointer;
+          color: #000;
+        }
+        >.cancel {
+          margin-right: 10px;
+        }
+        >.save {
+          background: url('./img/jz_btn_search.png') center center no-repeat;
+          background-size: cover;
+          color: #fff;
+        }
+      }
+    }
+  }
+}

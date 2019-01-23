@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="./index.css">
+  <!-- layer -->
+  <link href="../../scripts/lib/layer/skin/layer.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="app" id="app">
+    <!-- 左侧nav -->
+    <div class="left" id="left">
+      <!-- 顶部 -->
+      <div class="top">
+        <!-- logo -->
+        <div class="logo">
+          <img src="./img/10.png" alt="">
+        </div>
+        <!-- title -->
+        <div class="title">Openlayers</div>
+      </div>
+      <!-- btn -->
+      <div class="btn" id="zedie_btn" key=1>**</div>
+      <!-- list nav 项 -->
+      <div class="list nav_list" id="list">
+      </div>
+    </div>
+    <!-- 右侧 -->
+    <div class="right">
+      <iframe id="optionView" src="" name="ifm" frameborder="0" marginwidth="0" scrolling="yes"></iframe>
+    </div>
+  </div>
+</body>
+<!-- JQ -->
+<script src="../../scripts/lib/jquery/jquery.js" type="text/javascript"></script>
+<!-- conf -->
+<script src="../../scripts/common/conf.js" type="text/javascript"></script>
+<script src="../../scripts/common/common.js" type="text/javascript"></script>
+<!-- api -->
+<script src="../../scripts/api.js" type="text/javascript"></script>
+<!-- layer -->
+<script src="../../scripts/lib/layer/layer.js" type="text/javascript"></script>
+<!-- test -->
+<script src="./test_data.js" type="text/javascript"></script>
+<!-- main -->
+<script src="./index.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+  new conf.module.Nav().init();
+});
+</script>
+
+</html>

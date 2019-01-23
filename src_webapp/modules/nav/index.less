@@ -1,0 +1,137 @@
+* {
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Microsoft Yahei';
+  border: 0;
+}
+
+
+/* ------------------------------ */
+
+.app {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-left: 220px;
+  background-color: rgb(49, 56, 74);
+  transition: all 0.1s ease-in;
+  position: relative;
+  >.left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 220px;
+    height: 100%;
+    background-color: rgb(16, 24, 35);
+    box-sizing: border-box;
+    padding-top: 60px;
+    transition: all 0.1s ease-in;
+    >.top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 11;
+      width: 100%;
+      height: 60px;
+      background-color: rgb(19, 29, 39);
+      box-sizing: border-box;
+      padding-left: 60px;
+      >.logo {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 60px;
+        height: 100%;
+        >img {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          max-width: 80%;
+          max-height: 80%;
+        }
+      }
+      >.title {
+        width: 100%;
+        height: 100%;
+        line-height: 60px;
+        text-align: center;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 600;
+      }
+    }
+    >.btn {
+      position: absolute;
+      bottom: 0;
+      right: -30px;
+      width: 30px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
+      /* background-color: rgb(16, 24, 35); */
+      background-color: rgb(0, 208, 213);
+      color: rgb(16, 24, 35);
+      /* color: #fff; */
+      font-size: 12px;
+      font-weight: 800;
+      border-radius: 0px 5px 5px 0px;
+      box-shadow: 0px 0px 20px #000;
+      cursor: pointer;
+    }
+    >.list {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      >.item {
+        width: 100%;
+        height: 36px;
+        background-color: rgb(22, 34, 48);
+        position: relative;
+        margin-bottom: 2px;
+        cursor: pointer;
+        box-sizing: border-box;
+        border-left: 3px solid rgb(22, 34, 48);
+        >.box {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          height: 26px;
+          line-height: 26px;
+          font-size: 14px;
+          font-weight: 400;
+          color: #fff;
+          text-align: center;
+        }
+      }
+      >.ac,
+      >.item:hover {
+        background-color: #000;
+        border-left: 3px solid rgb(0, 208, 213);
+      }
+    }
+  }
+  >.right {
+    width: 100%;
+    height: 100%;
+    >iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  }
+}
