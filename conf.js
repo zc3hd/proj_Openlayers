@@ -18,7 +18,7 @@ module.exports = {
   // 登录用户名
   user: "cc",
   // 公网IP
-  ip: "47.94.202.107",
+  ip: "0.0.0.0",
   // 线上的数据库上传的文件夹
   db_to_olDir: 'db_task/db_from_out'
 }
