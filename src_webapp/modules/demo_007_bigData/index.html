@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>user_map_v1_0_ol</title>
+  <link rel="stylesheet" href="./index.css">
+  <link rel="stylesheet" href="../../scripts/lib/layer/skin/layer.css">
+  <link href="../../scripts/lib/ol-v5.0.2-dist/ol.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <div id="app">    
+    <!-- 地图 -->
+    <div class="map" id="map"></div>
+  </div>
+</body>
+<!-- JQ -->
+<script src="../../scripts/lib/jquery/jquery.js" type="text/javascript"></script>
+<!-- common -->
+<script src="../../scripts/common/common.js" type="text/javascript"></script>
+<!-- conf -->
+<script src="../../scripts/common/conf.js" type="text/javascript"></script>
+
+<!-- ol -->
+<script src="../../scripts/lib/ol-v5.0.2-dist/ol.js" type="text/javascript"></script>
+<!-- convert_p -->
+<!-- <script src="../../scripts/lib/p_convert/map_convertP.js" type="text/javascript"></script> -->
+
+<!-- layer -->
+<script src="../../scripts/lib/layer/layer.js" type="text/javascript"></script>
+<!-- test -->
+<script src="./test_data.js" type="text/javascript"></script>
+<!-- main -->
+<script src="./index.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+  new conf.module.Monitor({
+    Map_id: "map"
+  }).init();
+});
+</script>
+
+</html>

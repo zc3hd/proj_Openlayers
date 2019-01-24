@@ -4,14 +4,16 @@
 
 
     me.conf = {
+      center: [116.06, 39.67],
 
       // fence
       fence: {
-        // 1有数据 2没有数据 3编辑模式
-        mode: 2,
+        // 选择的绘制模式的ID
+        type_id: '',
+        // 选择的绘制模式
+        type: null,
 
-
-        // 图标数据
+        // 图标数据,用于加载弹窗的图片选择
         icon: {
           LineString: { type: 'LineString', src: './img/LineString.png' },
           Circle: { type: 'Circle', src: './img/Circle.png' },
@@ -21,14 +23,7 @@
           car: { type: 'icon', src: './img/car.png' },
           user: { type: 'icon', src: './img/user.png' },
         },
-
-        // 选择的绘制模式的ID
-        type_id: '',
-        // 选择的绘制模式
-        type: null,
-
-
-        // 选择类型后的样式
+        // 选择类型后的鼠标样式、绘制样式
         style: {
           // 汽车样式
           car: new ol.style.Style({
@@ -59,10 +54,10 @@
             image: new ol.style.Circle({
               radius: 20,
               stroke: new ol.style.Stroke({
-                color: 'rgb(18,150,219)'
+                color: 'rgb(47,79,79)'
               }),
               fill: new ol.style.Fill({
-                color: 'rgb(18,150,219)'
+                color: 'rgb(47,79,79)'
               })
             }),
           }),
@@ -70,14 +65,14 @@
           LineString: new ol.style.Style({
             // 线
             stroke: new ol.style.Stroke({
-              color: 'rgb(212,35,122)',
+              color: 'rgb(47,79,79)',
               width: 5
             }),
             // 绘制的那个标记
             image: new ol.style.Circle({
               radius: 5,
               stroke: new ol.style.Stroke({
-                color: 'rgb(212,35,122)'
+                color: 'rgb(47,79,79)'
               }),
               fill: new ol.style.Fill({
                 color: 'rgba(255,255,255,0.6)'
@@ -92,7 +87,7 @@
             }),
             // 线
             stroke: new ol.style.Stroke({
-              color: 'rgb(212,35,122)',
+              color: 'rgb(47,79,79)',
               width: 5
             }),
 
@@ -101,7 +96,7 @@
             image: new ol.style.Circle({
               radius: 5,
               stroke: new ol.style.Stroke({
-                color: 'rgb(212,35,122)'
+                color: 'rgb(47,79,79)'
               }),
               fill: new ol.style.Fill({
                 color: 'rgba(255,255,255,0.6)'
@@ -116,7 +111,7 @@
             }),
             // 线
             stroke: new ol.style.Stroke({
-              color: 'rgb(212,35,122)',
+              color: 'rgb(47,79,79)',
               width: 5
             }),
 
@@ -125,7 +120,7 @@
             image: new ol.style.Circle({
               radius: 5,
               stroke: new ol.style.Stroke({
-                color: 'rgb(212,35,122)'
+                color: 'rgb(47,79,79)'
               }),
               fill: new ol.style.Fill({
                 color: 'rgba(255,255,255,0.6)'
@@ -135,8 +130,6 @@
         },
       },
 
-
-      center: [116.06, 39.67],
     };
 
     me.all_obj = {
@@ -310,6 +303,61 @@
 
           return pi_90 - pi_ac;
         },
+        _map: function() {
+          me.map = new ol.Map({
+            target: 'map',
+            // 设置地图图层
+            layers: [
+              // 创建一个使用Open Street Map地图源的瓦片图层
+              // new ol.layer.Tile({ source: new ol.source.OSM() })
+              new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                  url: 'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0'
+                })
+              })
+            ],
+
+            // 控件
+            controls: ol.control.defaults({
+              attributionOptions: ({
+                // 是否折叠
+                collapsible: false
+              })
+            }),
+
+            logo: { src: './img/1.png', href: 'http://www.baidu.com' },
+
+            // ol.View 设置显示地图的视图
+            view: new ol.View({
+              // 定义地图显示中心于经度0度，纬度0度处
+              // center: [120, 39],
+              // 并且定义地图显示层级为2 
+              zoom: 12,
+              projection: 'EPSG:4326',
+              center: [116.06, 39.67],
+            }),
+          });
+          me._map_ev();
+        },
+        // 点击事件
+        _map_ev: function() {
+          var feature = null;
+          me.map.on('click', function(event) {
+            // 
+            feature = me.map.forEachFeatureAtPixel(event.pixel, function(feature) {
+              return feature;
+            });
+
+            if (feature == undefined) {
+              return;
+            }
+
+            // console.log(feature);
+            me._fence_del(feature);
+          });
+
+
+        },
 
 
         // ========================================
@@ -320,10 +368,10 @@
           me._fence_layer();
 
           // 初始化数据
-          me._fence_init();
+          me._fence_render();
 
           // 设置
-          me._fence_ev_mode();
+          me._fence_tool();
 
         },
         // 
@@ -334,6 +382,7 @@
 
           // 注入数据层--可以注入多个Feature，每个feature有自己的数据和样式
           me.all_obj.fence.data_c = new ol.source.Vector();
+          // console.log();
 
           // 
           me.all_obj.fence.layer.setSource(me.all_obj.fence.data_c);
@@ -342,17 +391,26 @@
           me.map.addLayer(me.all_obj.fence.layer);
         },
 
-
+        // ==========================================
         // 初始化数据
-        _fence_init: function() {
+        _fence_render: function() {
+
+          // 获取数据
+          me._fence_get_data();
+
+          // 
+          me._fence_render_init();
+        },
+        // 
+        _fence_get_data: function() {
+          fence_data = JSON.parse(window.localStorage.getItem("fence_data"));
+        },
+        // 渲染数据
+        _fence_render_init: function() {
           // 拿到数据
           var marker = null;
 
-          if (fence_data.length == 0) {
-            layer.msg('请选择样式进行绘制~');
-            return;
-          }
-
+          // 
           fence_data.forEach(function(ele, index) {
             // 图标
             if (ele.type == 'icon') {
@@ -375,7 +433,7 @@
               marker = me._fence_init_Polygon(ele);
             }
 
-            // 挂载属性
+            //
             marker.type = ele.type;
             marker.type_id = ele.style;
 
@@ -384,7 +442,11 @@
           });
 
           me._map_fit(me.all_obj.fence.data_c);
+          // 
+          marker = null;
         },
+
+
 
         // 图标
         _fence_init_icon: function(ele) {
@@ -440,53 +502,28 @@
         },
 
 
-        // 围栏事件的模式选择
-        _fence_ev_mode: function() {
 
-          // 有数据--可以清除画布 可以编辑画布
-          if (me.conf.fence.mode == 1) {
+        // ==========================================
+        // 编辑事件绑定
+        _fence_tool: function() {
 
-            $('#tool')
-              .show()
-              .html(`
-                <div class="item mode_2" id="f_edit_ing">开启编辑</div>
-                <div class="item mode_2" id="f_edit_done">编辑完成</div>
-                <div class="item mode_2" id="f_edit_out">退出编辑</div>
-                `)
-              .off()
-              // 开启编辑
-              .on('click', '#f_edit_ing', function() {
-                me._fence_edit_ing();
-              })
-              // 编辑完成
-              .on('click', '#f_edit_done', function() {
-                me._fence_edit_done();
-              })
-              .on('click', '#f_edit_out', function() {
-                me._fence_edit_out();
-              });
-
-
-            // 编辑完成先影藏
-            $('#f_edit_ing').show();
-            $('#f_edit_done').hide();
-          }
-
-          // 绘画
+          // 编辑
           $('#tool')
             .show()
             .html(`
-                <div class="item f_sel" id="f_sel">选择样式</div>
-                <div class="item f_draw_done" id="f_draw_done">绘画完成</div>`)
+                <div class="item f_edit_start" id="f_edit_start">开始编辑</div>
+                <div class="item f_edit_done" id="f_edit_done">编辑完成</div>
+                `)
             .off()
-            // 选择样式
-            .on('click', '#f_sel', function() {
-              me._fence_sel();
+            // 开始编辑
+            .on('click', '#f_edit_start', function() {
+              me._fence_edit_ing();
             })
-            // 绘制完成
-            .on('click', '#f_draw_done', function() {
-              me._fence_draw_done();
+            // 编辑完成
+            .on('click', '#f_edit_done', function() {
+              me._fence_edit_done();
             });
+
 
           // 提交数据
           $('#btn')
@@ -499,163 +536,91 @@
               me._fence_save();
             });
         },
-        // ==========================绘画模式
-        // 绘制选择
-        _fence_sel: function() {
 
+        // 开启编辑
+        _fence_edit_ing: function() {
+          // start 隐藏
+          $('#f_edit_start').hide();
+          // done 显示
+          $('#f_edit_done').show();
+
+
+          // 开启编辑模式
+          me.all_obj.fence.modify_tool = new ol.interaction.Modify({
+            source: me.all_obj.fence.data_c
+          });
+          // 
+          me.map.addInteraction(me.all_obj.fence.modify_tool);
+
+          layer.msg('对元素可以进行编辑和删除');
+        },
+        // 删除操作
+        _fence_del: function(feature) {
+          // 没有开启删除
+          if (me.all_obj.fence.modify_tool == null) {
+            return;
+          }
+          console.log(me.all_obj.fence.data_c);
           layer.open({
             type: 1,
             title: false,
-            area: ['620px', '200px'],
+            area: ['300px', '150px'],
             skin: 'cc_layer',
             anim: 1,
             shade: 0.6,
             closeBtn: 0,
-            btn: false,
             content: `
-            <div class='layer_core' id="layer_core_page">
+                <div class='layer_core'>
 
-              <div class="title">
-                选择样式
-              </div>
-
-              <div class="box">
-                
-                <div class="main_box" id="sel_box">
-
-
-                </div>
-
-                <div class="tool">
-                  <div class="box">
-                    <span class="cancel" id="cancel">cancel</span>
-                    <span class="save" id="save">save</span>
+                  <div class="title">
+                    删除
                   </div>
-                </div>
+
+                  <div class="del_box">
+                    <div class="info">
+                      请您确认要删除该元素么?
+                    </div>
+                    <div class="tool">
+                      <div class="box">
+                        <span class="cancel" id="cancel">取消</span>
+                        <span class="save" id="sure">确认</span>
+                      </div>
+                    </div>
+
+                  </div>
                 
-              </div>
-            </div>
-            `,
+                </div>
+              `,
+            btn: false,
             success: function(layero, index) {
 
-              // 加载图片
-              me._fence_type_load();
+              $('#cancel').on('click', function() {
+                layer.close(index);
+              });
 
-              // 取消事件
-              me._fence_sel_cancel(index);
+              // 
+              $('#sure').on('click', function() {
+                me.all_obj.fence.data_c.removeFeature(feature);
+                layer.close(index);
+              });
 
-              // 绘画初始化
-              me._fence_sel_save(index);
             },
           });
         },
-        // 开始绘制的加载图片
-        _fence_type_load: function() {
-          var str = '';
-          // 加载图标
-          for (var name in me.conf.fence.icon) {
-            str += `
-                <div class="normal">
-                  <div class="box" type=${me.conf.fence.icon[name].type} type_id=${name}>
-                    <div class="title">${name}</div>
-                    <img src=${me.conf.fence.icon[name].src} alt="">
-                  </div>
-                </div>
-                `;
-          }
+        // 完成编辑
+        _fence_edit_done: function() {
+          // 
+          $('#f_edit_start').show();
+          $('#f_edit_done').hide();
 
-          $('#sel_box').html(str);
+          // 清除模式
+          me.map.removeInteraction(me.all_obj.fence.modify_tool);
+          me.all_obj.fence.modify_tool = null;
 
-          var key = null;
-          $('#sel_box')
-            .off()
-            .on('click', '.box', function(e) {
-              key = $(e.currentTarget).hasClass('ac');
-              // 点击其他项目
-              if (!key) {
-                $('#sel_box .box').removeClass('ac');
-                $(e.currentTarget).addClass('ac');
-
-                // 样式类型-->初始化工具用什么类型
-                me.conf.fence.type = $(e.currentTarget).attr('type');
-                // 绘制的样式用什么样式
-                me.conf.fence.type_id = $(e.currentTarget).attr('type_id');
-              }
-            });
-        },
-        // 取消事件
-        _fence_sel_cancel: function(index) {
-          // 取消
-          $('#cancel')
-            .off()
-            .on('click', function() {
-              layer.close(index);
-            });
-        },
-        // 开始绘制初始化
-        _fence_sel_save: function(index) {
-          $('#save')
-            .off()
-            .on('click', function() {
-              // 按钮
-              $('#f_sel').hide();
-              $('#f_draw_done').show();
-
-              // 初始化工具
-              me._fence_draw_start();
-
-              // 关闭图层
-              layer.close(index);
-            });
+          layer.msg('完成编辑');
         },
 
 
-        // 初始化绘画工具，开始绘制
-        _fence_draw_start: function() {
-          // 清除工具
-          if (me.all_obj.fence.draw_tool != null) {
-            me.map.removeInteraction(me.all_obj.fence.draw_tool);
-          }
-
-          // 工具
-          me.all_obj.fence.draw_tool = new ol.interaction.Draw({
-            type: me.conf.fence.type == "icon" ? "Point" : me.conf.fence.type,
-            // 注意设置source，这样绘制好的线，就会添加到这个source里
-            source: me.all_obj.fence.data_c,
-            // 设置绘制时的样式
-            style: me.conf.fence.style[me.conf.fence.type_id],
-          });
-
-          // 添加工具
-          me.map.addInteraction(me.all_obj.fence.draw_tool);
-
-
-
-          // 每次绘制完成
-          me.all_obj.fence.draw_tool
-            .on('drawend', function(event) {
-
-              // event.feature 就是当前绘制完成的线的Feature
-              event.feature.setStyle(me.conf.fence.style[me.conf.fence.type_id]);
-
-              // 属性
-              event.feature.type = me.conf.fence.type;
-              event.feature.type_id = me.conf.fence.type_id;
-            });
-        },
-
-        // 绘画完成，重新进行选择
-        _fence_draw_done: function() {
-          // 清除绘制工具
-          me.map.removeInteraction(me.all_obj.fence.draw_tool);
-          me.all_obj.fence.draw_tool = null;
-
-          layer.msg('绘制完成');
-
-          // 按钮
-          $('#f_sel').show();
-          $('#f_draw_done').hide();
-        },
 
         // 提交数据
         _fence_save: function() {
@@ -666,12 +631,12 @@
           }
           // 有数据
           else {
-            // 绘画中
-            if (me.all_obj.fence.draw_tool != null) {
-              layer.msg('请先完成绘制，再进行保存');
+            // 编辑中
+            if (me.all_obj.fence.modify_tool != null) {
+              layer.msg('请先完成编辑，再进行保存');
               return;
             }
-            // 画完了
+            // 编辑完成
             else {
 
               // 抽取数据
@@ -717,313 +682,6 @@
 
           // console.log(fence_data);
         },
-
-
-
-
-
-
-        // ==========================编辑模式
-        // 开启编辑
-        _fence_edit_ing: function() {
-          // ing 隐藏
-          $('#f_edit_ing').hide();
-          // done 显示
-          $('#f_edit_done').show();
-
-
-          // 开启编辑模式
-          me.all_obj.fence.modify_tool = new ol.interaction.Modify({
-            source: me.all_obj.fence.data_c
-          });
-
-          me.map.addInteraction(me.all_obj.fence.modify_tool);
-        },
-        // 完成编辑
-        _fence_edit_done: function() {
-          // 编辑完成先影藏
-          $('#f_edit_ing').show();
-          $('#f_edit_done').hide();
-
-          // 清除模式
-          me.map.removeInteraction(me.all_obj.fence.modify_tool);
-          me.all_obj.fence.modify_tool = null;
-
-          // 围栏保存
-          me._fence_save();
-        },
-        // 退出编辑
-        _fence_edit_out: function() {
-          // 没有编辑完成
-          if (me.all_obj.fence.modify_tool != null) {
-            layer.msg('请先完成编辑');
-            return;
-          }
-          // 完成编辑了
-          else {
-
-            // 绘画模式
-            me.conf.fence.mode = 2;
-            me._fence_ev_mode();
-          }
-        },
-
-        // ==================================
-
-        // 进入编辑
-        _fence_in_edit: function() {
-          // 没有数据
-          if (me.all_obj.fence.data_c.getFeatures().length == 0) {
-            layer.msg('您还没有绘制');
-            return;
-          }
-          // 有数据
-          else {
-            // 绘画中
-            if (me.all_obj.fence.draw_tool != null) {
-              layer.msg('请先完成绘制，再进入编辑');
-              return;
-            }
-            // 画完了
-            else {
-              // 清除绘制工具
-              me.map.removeInteraction(me.all_obj.fence.draw_tool);
-              me.all_obj.fence.draw_tool = null;
-
-              // 进入模式1
-              me.conf.fence.mode = 1;
-              // 重新进入模式
-              me._fence_ev_mode();
-            }
-
-          }
-        },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        // ==========================================================
-        // 实时监控所有
-        _all_m: function() {
-
-          // 参数设置
-          me._all_m_set();
-
-          // 设置层
-          me._all_m_layer();
-
-          // 初始化
-          me._all_m_init(ps_arr);
-
-          // 最优一次
-          me._map_fit(me.all_obj.all_monitor.data_c);
-        },
-        // 初始化参数
-        _all_m_set: function() {
-          me.all_obj.all_monitor.key = true;
-        },
-        _all_m_layer: function() {
-          // 层
-          me.all_obj.all_monitor.layer = new ol.layer.Vector();
-
-          // 数据容器
-          me.all_obj.all_monitor.data_c = new ol.source.Vector();
-
-          // 注入层
-          me.all_obj.all_monitor.layer.setSource(me.all_obj.all_monitor.data_c);
-
-          // 打到地图上
-          me.map.addLayer(me.all_obj.all_monitor.layer);
-        },
-        // 所有点的初始化
-        _all_m_init: function() {
-
-
-          // ********************************************模拟数据
-          ps_arr = ps_arr;
-          ps_arr.forEach(function(ele, index) {
-            if (Math.random() > 0.5) {
-              ele.state = 1;
-            } else {
-              ele.state = 0;
-            }
-          });
-          // ********************************************模拟数据
-
-
-          //
-          ps_arr.forEach(function(ele, index) {
-            // 添加点
-            me._all_m_init_marker(ele);
-          });
-
-
-          me.all_obj.all_monitor.timer = setTimeout(function() {
-            if (me.all_obj.all_monitor.key) {
-              console.log('all_monitor');
-              me.all_obj.all_monitor.data_c.clear();
-              me._all_m_init();
-            }
-
-          }, me.conf.all_monitor.time);
-        },
-        // 添加点
-        _all_m_init_marker: function(ele) {
-          var p_data = new ol.Feature({
-            // 就一个参数啊，定义坐标
-            geometry: new ol.geom.Point(ele.lnglat),
-          });
-
-          p_data.setStyle(new ol.style.Style({
-            // 设置一个标识
-            image: new ol.style.Icon({
-              src: `./img/icon_${ele.state}.png`,
-
-              // 这个是相当于是进行切图了
-              // size: [50,50],
-
-              // 注意这个，竟然是比例 左上[0,0]  左下[0,1]  右下[1，1]
-              anchor: [0.5, 1],
-              // 这个直接就可以控制大小了
-              scale: 0.5
-            }),
-
-            text: new ol.style.Text({
-              // 对其方式
-              textAlign: 'center',
-              // 基准线
-              textBaseline: 'middle',
-              offsetY: -70,
-              // 文字样式
-              font: 'normal 16px 黑体',
-              // 文本内容
-              text: ele.name,
-              // 文本填充样式
-              fill: new ol.style.Fill({
-                color: 'rgba(255,255,255,1)'
-              }),
-              padding: [5, 15, 5, 15],
-              backgroundFill: new ol.style.Fill({
-                color: 'rgba(0,0,0,0.6)'
-              }),
-            })
-          }));
-
-          // 属性关注
-          p_data.ele = ele;
-
-
-          // 数据层收集
-          me.all_obj.all_monitor.data_c.addFeature(p_data);
-        },
-        // 数据容器
-        _all_m_clear: function() {
-          // 清除定时器
-          clearTimeout(me.all_obj.all_monitor.timer);
-          me.all_obj.all_monitor.key = false;
-
-          // 清除所有数据
-          me.all_obj.all_monitor.data_c.clear();
-          // 清除这层
-          me.map.removeLayer(me.all_obj.all_monitor.layer);
-        },
-
-
-
-
-
-
-
-        _map: function() {
-          me.map = new ol.Map({
-            target: 'map',
-            // 设置地图图层
-            layers: [
-              // 创建一个使用Open Street Map地图源的瓦片图层
-              // new ol.layer.Tile({ source: new ol.source.OSM() })
-              new ol.layer.Tile({
-                source: new ol.source.XYZ({
-                  url: 'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0'
-                })
-              })
-            ],
-
-            // 控件
-            controls: ol.control.defaults({
-              attributionOptions: ({
-                // 是否折叠
-                collapsible: false
-              })
-            }),
-
-            logo: { src: './img/1.png', href: 'http://www.baidu.com' },
-
-            // ol.View 设置显示地图的视图
-            view: new ol.View({
-              // 定义地图显示中心于经度0度，纬度0度处
-              // center: [120, 39],
-              // 并且定义地图显示层级为2 
-              zoom: 12,
-              projection: 'EPSG:4326',
-              center: [116.06, 39.67],
-            }),
-          });
-        },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
       };

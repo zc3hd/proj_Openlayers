@@ -8,7 +8,7 @@
     // 挂载模块
     module: {},
     // --------------load样式的全局配置
-    load_sty:0,
+    load_sty: 0,
     // 大弹窗
     layer_big: {
       title: false,
@@ -16,11 +16,12 @@
     },
     // =============================
     // 同源服务器根路径设置
-    root_path:'/cors-mot',
+    root_path: '/cors-mot',
+    tdt: "13beac02c8abfbd558a20faacf5f2084",
     // =============================
     // 本地测试跨域测试
     //开启跨域模式
-    cors_key:true,
-    cors_port:8080,
+    cors_key: true,
+    cors_port: 8080,
   };
 })(window, jQuery);

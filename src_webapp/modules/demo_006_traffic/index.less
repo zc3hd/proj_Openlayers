@@ -1,0 +1,39 @@
+* {
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Microsoft Yahei';
+  border: 0;
+  background-color: rgb(49, 56, 74);
+}
+
+
+/* ------------------------------ */
+
+// 
+.app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  >.map {
+    width: 50%;
+    height: 100%;
+    float: left;
+  }
+  >#map_ol {
+    width: 100%;
+    // 控件隐藏
+    .ol-zoom{
+      display: none;
+    }
+  }
+  >#map_gd {
+    width: 0%;
+  }
+}

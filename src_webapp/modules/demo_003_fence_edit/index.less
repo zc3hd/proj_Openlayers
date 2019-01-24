@@ -57,7 +57,7 @@ body {
       background-color: rgb( 0, 0, 128);
       color: #fff;
     }
-    >.f_draw_done {
+    >.f_edit_done {
       display: none;
     }
   }
@@ -129,19 +129,21 @@ body {
     box-sizing: border-box;
     padding-left: 20px;
   }
-  >.box {
+  >.del_box {
     width: 100%;
     height: 100%;
-    position: relative;
-    box-sizing: border-box;
-    padding-bottom: 52px;
-    // 工具栏
-    >.tool {
-      position: absolute;
-      left: 0;
-      bottom: 0;
+    >.info {
       width: 100%;
-      height: 52px;
+      height: 50%;
+      line-height: 75px;
+      text-align: center;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    >.tool {
+      width: 100%;
+      height: 50%;
+      position: relative;
       >.box {
         width: 140px;
         height: 32px;
@@ -168,61 +170,5 @@ body {
         }
       }
     }
-    // 主要盒子
-    >.main_box {
-      width: 100%;
-      height: 100%;
-      // 
-      >.normal {
-        height: 100px;
-        width: 100px;
-        float: left;
-        position: relative;
-        >.box {
-          width: 93%;
-          height: 93%;
-          line-height: 93px;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-          transition: all 0.1s ease-in;
-          cursor: pointer;
-          >.title {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0%;
-            left: 0%;
-            z-index: 1;
-            background-color: rgba(0, 0, 255, 0.8);
-            text-align: center;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 600;
-          }
-          >img {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            z-index: 2;
-            transform: translate(-50%, -50%);
-            max-width: 90%;
-            max-height: 90%;
-          }
-        }
-        >.box:hover,
-        >.ac {
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-          >.title {
-            z-index: 3;
-            display: block;
-          }
-        }
-      }
-    }
-    // ----------------------
   }
 }

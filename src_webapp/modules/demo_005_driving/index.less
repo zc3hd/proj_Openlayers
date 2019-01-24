@@ -1,0 +1,69 @@
+* {
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Microsoft Yahei';
+  border: 0;
+  background-color: rgb(49, 56, 74);
+}
+
+
+/* ------------------------------ */
+
+// 
+.app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  >.tool {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 100px;
+    height: 100px;
+    z-index: 999;
+    >div {
+      width: 100%;
+      height: 33%;
+      box-sizing: border-box;
+      padding: 3px;
+      >.box {
+        width: 100%;
+        height: 100%;
+        background-color: blue;
+        color: #fff;
+        text-align: center;
+        line-height: 27px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+      }
+      >#clear{
+        display: none;
+      }
+    }
+  }
+  >.map {
+    width: 50%;
+    height: 100%;
+    float: left;
+  }
+  >#map_ol {
+    width: 100%;
+    // 控件隐藏
+    .ol-zoom{
+      display: none;
+    }
+  }
+  >#map_gd {
+    width: 0%;
+  }
+}
