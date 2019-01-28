@@ -412,6 +412,7 @@
 
           // 
           fence_data.forEach(function(ele, index) {
+            console.log(ele);
             // 图标
             if (ele.type == 'icon') {
               marker = me._fence_init_icon(ele);
@@ -493,6 +494,8 @@
         },
         // 多边形
         _fence_init_Polygon: function(ele) {
+          console.log(ele.path);
+          console.log(JSON.stringify(ele.path))
           var marker = new ol.Feature({
             geometry: new ol.geom.Polygon(ele.path)
           });

@@ -218,13 +218,13 @@
           });
 
           // 
-          me.all_obj.map_layer.chang_j = new ol.layer.Tile({
-            source: new ol.source.TileWMS({
-              url: 'http://172.168.2.164:8080/geoserver/NHHY/wms?service=WMS&version=1.1.0&request=GetMap&layers=NHHY:cj&styles=&bbox=1.1636145E7,3335033.999999999,1.358618E7,3811091.4999999986&width=768&height=330&srs=EPSG:3857&format=application/openlayers',
-            }),
-            projection: 'EPSG:4326',
-            zIndex: me.conf.index_1 + 1,
-          });
+          // me.all_obj.map_layer.chang_j = new ol.layer.Tile({
+          //   source: new ol.source.TileWMS({
+          //     url: 'http://172.168.2.164:8080/geoserver/NHHY/wms?service=WMS&version=1.1.0&request=GetMap&layers=NHHY:cj&styles=&bbox=1.1636145E7,3335033.999999999,1.358618E7,3811091.4999999986&width=768&height=330&srs=EPSG:3857&format=application/openlayers',
+          //   }),
+          //   projection: 'EPSG:4326',
+          //   zIndex: me.conf.index_1 + 1,
+          // });
 
         },
         // 地图层的获取
@@ -282,7 +282,7 @@
               // 普通
               me.all_obj.map_layer.tdt_pt,
               // 长江
-              me.all_obj.map_layer.chang_j
+              // me.all_obj.map_layer.chang_j
             ],
           });
 

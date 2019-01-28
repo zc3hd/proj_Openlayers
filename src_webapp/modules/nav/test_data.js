@@ -42,4 +42,9 @@ var nav_fuwu_data = [
     name: '显示策略',
     url: '../demo_007_bigData/index.html',
   },
+  // 
+  {
+    name: '模型构建',
+    url: '../demo_008_dataModel/index.html',
+  },
 ];

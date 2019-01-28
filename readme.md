@@ -3,8 +3,10 @@
 * ol常用业务demo
 * demo目录在`src_webapp/modules/`
 
-* 【路径规划】可以本案例详解[here](https://blog.csdn.net/weixin_42891221/article/details/82143188)
-* 【交通热力】可以本案例详解[here](https://blog.csdn.net/weixin_42891221/article/details/82218401)
+* 【路径规划】可读本案例详解[here](https://blog.csdn.net/weixin_42891221/article/details/82143188)
+
+* 【交通热力】可读本案例详解[here](https://blog.csdn.net/weixin_42891221/article/details/82218401)
+
 * 【显示策略】思路
 ```
 当前层级<设置的层级
@@ -19,3 +21,10 @@ zoom>zoom_set:由屏幕角点进行拿到数据，其他区域不显示数据；
 3.微观数据的实时请求，只有在层级达到时才开始拿数据进行渲染；
 ```
 
+* 【模型构建】思路
+```
+1.三生成第一个三角形模型；
+2.下一个点，对应整个模型（所有的三角形），每个三角形模型都可以拿到三组新生成的数组；
+3.比较所有数组重复的次数
+4.拿到重复次数最好，狭长比例最小的三角形；
+```
